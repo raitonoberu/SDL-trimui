@@ -654,6 +654,27 @@ endmacro()
 
 # Requires:
 # - n/a
+macro(CheckMali)
+  if(SDL_MALI)
+    check_c_source_compiles("
+        #define LINUX
+        #define EGL_API_FB
+        #include <EGL/egl.h>
+        int main(int argc, char** argv) {}" HAVE_MALI_EGL_FB)
+    if(HAVE_MALI_EGL_FB)
+      set(HAVE_MALI TRUE)
+      set(HAVE_SDL_VIDEO TRUE)
+
+      sdl_glob_sources("${SDL3_SOURCE_DIR}/src/video/mali-fbdev/*.c")
+      set(SDL_VIDEO_DRIVER_MALI 1)
+      sdl_compile_definitions(PUBLIC "LINUX" "EGL_API_FB")
+      sdl_link_dependency(mali LIBS EGL)
+    endif()
+  endif()
+endmacro()
+
+# Requires:
+# - n/a
 macro(CheckVivante)
   if(SDL_VIVANTE)
     check_c_source_compiles("
